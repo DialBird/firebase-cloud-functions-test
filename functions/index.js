@@ -1,4 +1,5 @@
 const functions = require('firebase-functions');
+const stripe = require('stripe')(functions.config().stripe.sk_test);
 
 exports.hello = functions.https.onRequest((req, res) => {
   const name = req.query.name;
@@ -6,13 +7,17 @@ exports.hello = functions.https.onRequest((req, res) => {
 });
 
 exports.c_card = functions.https.onRequest((req, res) => {
-  const stripe = require('stripe')(functions.config().stripe.sk_test);
+  const number = req.body.number;
+  const exp_month = req.body.exp_month;
+  const exp_year = req.body.exp_year;
+  const cvc = req.body.cvc;
+
   stripe.tokens.create({
     card: {
-      "number": '4242424242424242',
-      "exp_month": 12,
-      "exp_year": 2019,
-      "cvc": '123'
+      number,
+      exp_month,
+      exp_year,
+      cvc,
     }
   }, (err, token) => {
     if (err !== null) {
